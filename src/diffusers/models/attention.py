@@ -222,10 +222,14 @@ class BasicTransformerBlock(nn.Module):
         timestep: Optional[torch.LongTensor] = None,
         cross_attention_kwargs: Dict[str, Any] = None,
         class_labels: Optional[torch.LongTensor] = None,
+        num_frames: Optional[int] = None,
     ) -> torch.FloatTensor:
         # Notice that normalization is always applied before the real computation in the following blocks.
         # 0. Self-Attention
-        batch_size = hidden_states.shape[0]
+        batch_size, length, channels = hidden_states.size()
+        assert batch_size % num_frames == 0
+        if num_frames is not None: # [Multiview] conduct multiview attention
+            hidden_states = hidden_states.reshape(batch_size//num_frames, num_frames*length, channels)
 
         if self.use_ada_layer_norm:
             norm_hidden_states = self.norm1(hidden_states, timestep)
@@ -275,6 +279,9 @@ class BasicTransformerBlock(nn.Module):
             hidden_states = self.fuser(hidden_states, gligen_kwargs["objs"])
 
         # 3. Cross-Attention
+        if num_frames is not None: # [Multiview] conduct multiview attention
+            hidden_states = hidden_states.reshape(batch_size, length, channels)
+        
         if self.attn2 is not None:
             if self.use_ada_layer_norm:
                 norm_hidden_states = self.norm2(hidden_states, timestep)

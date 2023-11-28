@@ -102,6 +102,7 @@ class DualTransformer2DModel(nn.Module):
         attention_mask=None,
         cross_attention_kwargs=None,
         return_dict: bool = True,
+        num_frames: Optional[int] = None,
     ):
         """
         Args:
