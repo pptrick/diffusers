@@ -222,13 +222,13 @@ class BasicTransformerBlock(nn.Module):
         timestep: Optional[torch.LongTensor] = None,
         cross_attention_kwargs: Dict[str, Any] = None,
         class_labels: Optional[torch.LongTensor] = None,
-        num_frames: Optional[int] = None,
     ) -> torch.FloatTensor:
         # Notice that normalization is always applied before the real computation in the following blocks.
         # 0. Self-Attention
         batch_size, length, channels = hidden_states.size()
-        assert batch_size % num_frames == 0
+        num_frames = cross_attention_kwargs.get("num_frames", None) if cross_attention_kwargs is not None else None
         if num_frames is not None: # [Multiview] conduct multiview attention
+            assert batch_size % num_frames == 0
             hidden_states = hidden_states.reshape(batch_size//num_frames, num_frames*length, channels)
 
         if self.use_ada_layer_norm:

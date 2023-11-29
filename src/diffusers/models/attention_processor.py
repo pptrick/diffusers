@@ -704,6 +704,7 @@ class AttnProcessor:
         attention_mask: Optional[torch.FloatTensor] = None,
         temb: Optional[torch.FloatTensor] = None,
         scale: float = 1.0,
+        **kwargs,
     ) -> torch.Tensor:
         residual = hidden_states
 
@@ -1180,6 +1181,7 @@ class AttnProcessor2_0:
         attention_mask: Optional[torch.FloatTensor] = None,
         temb: Optional[torch.FloatTensor] = None,
         scale: float = 1.0,
+        **kwargs,
     ) -> torch.FloatTensor:
         residual = hidden_states
 
@@ -2009,6 +2011,7 @@ class IPAdapterAttnProcessor(nn.Module):
         attention_mask=None,
         temb=None,
         scale=1.0,
+        **kwargs,
     ):
         if scale != 1.0:
             logger.warning("`scale` of IPAttnProcessor should be set with `set_ip_adapter_scale`.")
@@ -2124,6 +2127,7 @@ class IPAdapterAttnProcessor2_0(torch.nn.Module):
         attention_mask=None,
         temb=None,
         scale=1.0,
+        **kwargs,
     ):
         if scale != 1.0:
             logger.warning("`scale` of IPAttnProcessor should be set by `set_ip_adapter_scale`.")

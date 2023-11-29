@@ -254,7 +254,6 @@ class Transformer2DModel(ModelMixin, ConfigMixin):
         attention_mask: Optional[torch.Tensor] = None,
         encoder_attention_mask: Optional[torch.Tensor] = None,
         return_dict: bool = True,
-        num_frames: Optional[int] = None,
     ):
         """
         The [`Transformer2DModel`] forward method.
@@ -289,8 +288,6 @@ class Transformer2DModel(ModelMixin, ConfigMixin):
             return_dict (`bool`, *optional*, defaults to `True`):
                 Whether or not to return a [`~models.unet_2d_condition.UNet2DConditionOutput`] instead of a plain
                 tuple.
-            num_frames (`int`, *optional*, defaults to None):
-                When giving multiview images, conduct multiview cross attention.
 
         Returns:
             If `return_dict` is True, an [`~models.transformer_2d.Transformer2DModelOutput`] is returned, otherwise a
@@ -389,7 +386,6 @@ class Transformer2DModel(ModelMixin, ConfigMixin):
                     timestep,
                     cross_attention_kwargs,
                     class_labels,
-                    num_frames,
                     **ckpt_kwargs,
                 )
             else:
@@ -401,7 +397,6 @@ class Transformer2DModel(ModelMixin, ConfigMixin):
                     timestep=timestep,
                     cross_attention_kwargs=cross_attention_kwargs,
                     class_labels=class_labels,
-                    num_frames=num_frames,
                 )
 
         # 3. Output

@@ -219,7 +219,6 @@ class UNet2DConditionModel(ModelMixin, ConfigMixin, UNet2DConditionLoadersMixin)
         mid_block_only_cross_attention: Optional[bool] = None,
         cross_attention_norm: Optional[str] = None,
         addition_embed_type_num_heads=64,
-        camera_dim=16,
     ):
         super().__init__()
 
@@ -400,6 +399,7 @@ class UNet2DConditionModel(ModelMixin, ConfigMixin, UNet2DConditionLoadersMixin)
             # Kandinsky 2.2 ControlNet
             self.add_embedding = ImageHintTimeEmbedding(image_embed_dim=encoder_hid_dim, time_embed_dim=time_embed_dim)
         elif addition_embed_type == "camera": # [Multiview] add camera embedding
+            camera_dim = 16 # camera dim should be fixed to 16, represents a 4x4 matrix
             self.add_embedding = TimestepEmbedding(
                 camera_dim,
                 time_embed_dim,
@@ -819,7 +819,6 @@ class UNet2DConditionModel(ModelMixin, ConfigMixin, UNet2DConditionLoadersMixin)
         down_intrablock_additional_residuals: Optional[Tuple[torch.Tensor]] = None,
         encoder_attention_mask: Optional[torch.Tensor] = None,
         return_dict: bool = True,
-        num_frames: Optional[int] = None,
     ) -> Union[UNet2DConditionOutput, Tuple]:
         r"""
         The [`UNet2DConditionModel`] forward method.
@@ -857,8 +856,6 @@ class UNet2DConditionModel(ModelMixin, ConfigMixin, UNet2DConditionLoadersMixin)
             return_dict (`bool`, *optional*, defaults to `True`):
                 Whether or not to return a [`~models.unet_2d_condition.UNet2DConditionOutput`] instead of a plain
                 tuple.
-            num_frames (`int`, *optional*, defaults to None):
-                When giving multiview images, conduct multiview cross attention.
             
             cross_attention_kwargs (`dict`, *optional*):
                 A kwargs dictionary that if specified is passed along to the [`AttnProcessor`].
@@ -1100,7 +1097,6 @@ class UNet2DConditionModel(ModelMixin, ConfigMixin, UNet2DConditionLoadersMixin)
                     attention_mask=attention_mask,
                     cross_attention_kwargs=cross_attention_kwargs,
                     encoder_attention_mask=encoder_attention_mask,
-                    num_frames=num_frames,
                     **additional_residuals,
                 )
             else:
@@ -1131,7 +1127,6 @@ class UNet2DConditionModel(ModelMixin, ConfigMixin, UNet2DConditionLoadersMixin)
                     attention_mask=attention_mask,
                     cross_attention_kwargs=cross_attention_kwargs,
                     encoder_attention_mask=encoder_attention_mask,
-                    num_frames=num_frames,
                 )
             else:
                 sample = self.mid_block(sample, emb)
@@ -1169,7 +1164,6 @@ class UNet2DConditionModel(ModelMixin, ConfigMixin, UNet2DConditionLoadersMixin)
                     upsample_size=upsample_size,
                     attention_mask=attention_mask,
                     encoder_attention_mask=encoder_attention_mask,
-                    num_frames=num_frames
                 )
             else:
                 sample = upsample_block(
